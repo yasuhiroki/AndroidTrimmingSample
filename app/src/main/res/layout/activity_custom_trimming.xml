@@ -13,8 +13,8 @@
         android:background="@color/colorPrimary"
         tools:context=".CustomTrimmingActivity">
 
-        <com.yalantis.ucrop.view.UCropView
-            android:id="@+id/ucrop_view"
+        <FrameLayout
+            android:id="@+id/ucrop_frame"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -24,7 +24,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        </com.yalantis.ucrop.view.UCropView>
+            <com.yalantis.ucrop.view.UCropView
+                android:id="@+id/ucrop_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <FrameLayout
+                android:id="@+id/deco_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/button_deco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deco"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ucrop_frame" />
+
+        <Button
+            android:id="@+id/button_crop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Crop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_deco" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

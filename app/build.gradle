@@ -34,6 +34,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     implementation 'com.github.yalantis:ucrop:2.2.4'
+    implementation 'com.github.a10lab:GestureTransformableView:64531d53d8f3af95cf5cf7bdbb92923c66c0feb2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
