@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Log
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -50,20 +49,25 @@ class MainActivity : AppCompatActivity() {
         binding.imageView.setImageURI(dst)
 
         val decoInfos: ArrayList<DecoInfo>? = data?.getParcelableArrayListExtra("DATA")
-        if (decoInfos != null) {
-            for (sc in decoInfos) {
-                val decoImage = ImageView(this, null)
-                decoImage.setImageResource(R.mipmap.ic_launcher)
-                decoImage.rotation = sc.rect
-                decoImage.scaleX = sc.scale
-                decoImage.scaleY = sc.scale
-                decoImage.translationX = sc.marginLeft
-                decoImage.translationY = sc.marginTop
-                binding.decoFrame.addView(
-                    decoImage,
-                    FrameLayout.LayoutParams(sc.layoutWidth, sc.layoutHeight)
-                )
+        decoInfos?.forEach {
+            val rateX: Float = binding.decoFrame.width.toFloat() / it.frameWidth
+            val rateY: Float = binding.decoFrame.height.toFloat() / it.frameHeight
+
+            val decoImage = ImageView(this, null)
+            decoImage.setImageResource(R.mipmap.ic_launcher)
+            decoImage.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+                decoImage.rotation = it.rect
+                decoImage.scaleX = it.scale * rateX
+                decoImage.scaleY = it.scale * rateY
+                decoImage.translationX =
+                    it.marginLeft * rateX + decoImage.measuredWidth * it.scale * (rateX - 1) / 2
+                decoImage.translationY =
+                    it.marginTop * rateY + decoImage.measuredWidth * it.scale * (rateY - 1) / 2
             }
+            binding.decoFrame.addView(
+                decoImage,
+                FrameLayout.LayoutParams(it.layoutWidth, it.layoutHeight)
+            )
         }
     }
 }
@@ -76,13 +80,19 @@ class DecoInfo : Parcelable {
     var layoutWidth: Int
     var layoutHeight: Int
 
-    constructor(v: ImageView) {
+    var frameWidth: Int
+    var frameHeight: Int
+
+    constructor(v: ImageView, f: FrameLayout) {
         marginLeft = v.translationX
         marginTop = v.translationY
         scale = v.scaleX
         rect = v.rotation
         layoutWidth = v.layoutParams.width
         layoutHeight = v.layoutParams.height
+
+        frameWidth = f.width
+        frameHeight = f.height
     }
 
     constructor(i: Parcel) {
@@ -92,6 +102,8 @@ class DecoInfo : Parcelable {
         rect = i.readFloat()
         layoutWidth = i.readInt()
         layoutHeight = i.readInt()
+        frameWidth = i.readInt()
+        frameHeight = i.readInt()
     }
 
     override fun describeContents(): Int {
@@ -105,6 +117,8 @@ class DecoInfo : Parcelable {
         dest.writeFloat(rect)
         dest.writeInt(layoutWidth)
         dest.writeInt(layoutHeight)
+        dest.writeInt(frameWidth)
+        dest.writeInt(frameHeight)
     }
 
     companion object CREATOR : Parcelable.Creator<DecoInfo> {

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -46,7 +45,7 @@ class CustomTrimmingActivity : AppCompatActivity() {
                     ) {
                         setResultUri(
                             resultUri,
-                            binding.ucropView.cropImageView.getTargetAspectRatio(),
+                            binding.ucropView.cropImageView.targetAspectRatio,
                             offsetX,
                             offsetY,
                             imageWidth,
@@ -85,7 +84,7 @@ class CustomTrimmingActivity : AppCompatActivity() {
         val decoInfos: ArrayList<DecoInfo> =
             ArrayList(binding.decoFrame.children.map {
                 val decoImageView = it as GestureTransformableImageView
-                DecoInfo(decoImageView)
+                DecoInfo(decoImageView, binding.decoFrame)
             }.toList())
 
         setResult(
