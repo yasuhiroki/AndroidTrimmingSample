@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                 decoImage.translationX =
                     it.marginLeft * rateX + decoImage.measuredWidth * it.scale * (rateX - 1) / 2
                 decoImage.translationY =
-                    it.marginTop * rateY + decoImage.measuredWidth * it.scale * (rateY - 1) / 2
+                    it.marginTop * rateY + decoImage.measuredHeight * it.scale * (rateY - 1) / 2
             }
             binding.decoFrame.addView(
                 decoImage,
