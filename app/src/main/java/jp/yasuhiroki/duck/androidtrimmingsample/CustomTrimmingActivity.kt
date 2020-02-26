@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
@@ -22,14 +23,34 @@ class CustomTrimmingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_trimming)
-        binding = DataBindingUtil.setContentView<ActivityCustomTrimmingBinding>(
-            this,
-            R.layout.activity_custom_trimming
-        )
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_custom_trimming)
 
         val src = intent.getParcelableExtra<Uri>("SRC_URI")!!
         val dst = intent.getParcelableExtra<Uri>("DST_URI")!!
         binding.ucropView.cropImageView.setImageUri(src, dst)
+
+        val decoInfos: ArrayList<DecoInfo>? = intent.getParcelableArrayListExtra("DATA")
+        val onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener =
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    decoInfos?.forEach {
+                        val decoImage = GestureTransformableImageView(baseContext, null)
+                        decoImage.setImageResource(R.mipmap.ic_launcher)
+                        decoImage.rotation = it.rect
+                        decoImage.setScale(it.scale)
+                        decoImage.setAngle(it.rect)
+                        decoImage.translationX = it.marginLeft
+                        decoImage.translationY = it.marginTop
+
+                        binding.decoFrame.addView(
+                            decoImage,
+                            FrameLayout.LayoutParams(it.layoutWidth, it.layoutHeight)
+                        )
+                    }
+                    binding.decoFrame.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            }
+        binding.decoFrame.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
 
         binding.buttonCrop.setOnClickListener {
             binding.ucropView.cropImageView.cropAndSaveImage(
@@ -71,7 +92,6 @@ class CustomTrimmingActivity : AppCompatActivity() {
             binding.decoFrame.addView(imageView, lp)
         }
     }
-
 
     private fun setResultUri(
         uri: Uri?,

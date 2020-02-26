@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     private val src: Uri = Uri.parse("https://avatars1.githubusercontent.com/u/3108110")
     private lateinit var dst: Uri
+    private var decoInfos: ArrayList<DecoInfo>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         binding.button2.setOnClickListener {
             val intent = Intent(this, CustomTrimmingActivity::class.java)
             intent.putExtra("SRC_URI", src)
-            intent.putExtra("DST_URI", dst)
+                .putExtra("DST_URI", dst)
+                .putParcelableArrayListExtra("DATA", decoInfos)
             startActivityForResult(intent, 1)
         }
     }
@@ -45,9 +47,10 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         binding.imageView.setImageBitmap(null)
         binding.decoFrame.removeAllViews()
+
         binding.imageView.setImageURI(dst)
 
-        val decoInfos: ArrayList<DecoInfo>? = data?.getParcelableArrayListExtra("DATA")
+        decoInfos = data?.getParcelableArrayListExtra("DATA")
         decoInfos?.forEach {
             val rateX: Float = binding.decoFrame.width.toFloat() / it.frameWidth
             val rateY: Float = binding.decoFrame.height.toFloat() / it.frameHeight
