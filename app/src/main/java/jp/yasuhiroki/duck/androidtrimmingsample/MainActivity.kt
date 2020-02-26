@@ -28,15 +28,12 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.button.setOnClickListener {
-            binding.imageView.setImageBitmap(null)
-            binding.decoFrame.removeAllViews()
             UCrop.of(src, dst)
                 .withAspectRatio(1f, 1f)
                 .withMaxResultSize(200, 200)
                 .start(this)
         }
         binding.button2.setOnClickListener {
-            binding.decoFrame.removeAllViews()
             val intent = Intent(this, CustomTrimmingActivity::class.java)
             intent.putExtra("SRC_URI", src)
             intent.putExtra("DST_URI", dst)
@@ -46,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        binding.imageView.setImageBitmap(null)
+        binding.decoFrame.removeAllViews()
         binding.imageView.setImageURI(dst)
 
         val decoInfos: ArrayList<DecoInfo>? = data?.getParcelableArrayListExtra("DATA")
