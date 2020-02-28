@@ -31,11 +31,22 @@
 
             <FrameLayout
                 android:id="@+id/deco_frame"
-                android:layout_margin="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_margin="16dp" />
 
         </FrameLayout>
+
+        <View
+            android:id="@+id/blocking"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/ucrop_frame"
+            app:layout_constraintEnd_toEndOf="@+id/ucrop_frame"
+            app:layout_constraintStart_toStartOf="@+id/ucrop_frame"
+            app:layout_constraintTop_toTopOf="@+id/ucrop_frame" />
 
         <Button
             android:id="@+id/button_deco"

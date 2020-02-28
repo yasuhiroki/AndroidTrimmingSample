@@ -25,6 +25,24 @@ class CustomTrimmingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_custom_trimming)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_custom_trimming)
 
+        binding.ucropView.cropImageView.setTransformImageListener(object : TransformImageView.TransformImageListener {
+            override fun onRotate(currentAngle: Float) {
+                // nothing
+            }
+
+            override fun onLoadComplete() {
+                binding.blocking.visibility = View.GONE
+            }
+
+            override fun onScale(currentScale: Float) {
+                // nothing
+            }
+
+            override fun onLoadFailure(e: Exception) {
+                // nothing
+            }
+        })
+
         val src = intent.getParcelableExtra<Uri>("SRC_URI")!!
         val dst = intent.getParcelableExtra<Uri>("DST_URI")!!
         binding.ucropView.cropImageView.setImageUri(src, dst)
