@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private val src: Uri = Uri.parse("https://avatars1.githubusercontent.com/u/3108110")
     private lateinit var dst: Uri
     private var decoInfos: ArrayList<DecoInfo>? = null
+    private var cropImageMatrix: FloatArray? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, CustomTrimmingActivity::class.java)
             intent.putExtra("SRC_URI", src)
                 .putExtra("DST_URI", dst)
+                .putExtra("MATRIX", cropImageMatrix)
                 .putParcelableArrayListExtra("DATA", decoInfos)
             startActivityForResult(intent, 1)
         }
@@ -49,6 +51,8 @@ class MainActivity : AppCompatActivity() {
         binding.decoFrame.removeAllViews()
 
         binding.imageView.setImageURI(dst)
+
+        cropImageMatrix = data?.getFloatArrayExtra("MATRIX")
 
         decoInfos = data?.getParcelableArrayListExtra("DATA")
         decoInfos?.forEach {

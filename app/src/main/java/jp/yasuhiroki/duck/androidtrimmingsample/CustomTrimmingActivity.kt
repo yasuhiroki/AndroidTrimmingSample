@@ -3,16 +3,20 @@ package jp.yasuhiroki.duck.androidtrimmingsample
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.values
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import com.yalantis.ucrop.UCrop
 import com.yalantis.ucrop.callback.BitmapCropCallback
+import com.yalantis.ucrop.view.TransformImageView
 import jp.ogwork.gesturetransformableview.view.GestureTransformableImageView
 import jp.yasuhiroki.duck.androidtrimmingsample.databinding.ActivityCustomTrimmingBinding
 
@@ -25,7 +29,8 @@ class CustomTrimmingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_custom_trimming)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_custom_trimming)
 
-        binding.ucropView.cropImageView.setTransformImageListener(object : TransformImageView.TransformImageListener {
+        binding.ucropView.cropImageView.setTransformImageListener(object :
+            TransformImageView.TransformImageListener {
             override fun onRotate(currentAngle: Float) {
                 // nothing
             }
@@ -43,9 +48,24 @@ class CustomTrimmingActivity : AppCompatActivity() {
             }
         })
 
+        // This is workaround for update init Matrix.
+        // Overwrite ucropView's listener to change overlayView aspect,
+        // but it is not necessary because overlayView is fixed square layout in this Activity.
+        // Be careful, following logic implementation is overwrote when UCropView#resetCropImageView() method is called.
+        binding.ucropView.cropImageView.setCropBoundsChangeListener {
+            val imageMatrixValues = intent.getFloatArrayExtra("MATRIX")
+            if (imageMatrixValues != null) {
+                val matrix = Matrix().apply { setValues(imageMatrixValues) }
+                binding.ucropView.cropImageView.imageMatrix = matrix
+            }
+        }
+
         val src = intent.getParcelableExtra<Uri>("SRC_URI")!!
         val dst = intent.getParcelableExtra<Uri>("DST_URI")!!
         binding.ucropView.cropImageView.setImageUri(src, dst)
+
+        // Square Crop
+        binding.ucropView.overlayView.setTargetAspectRatio(1f)
 
         val decoInfos: ArrayList<DecoInfo>? = intent.getParcelableArrayListExtra("DATA")
         val onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener =
@@ -71,6 +91,7 @@ class CustomTrimmingActivity : AppCompatActivity() {
         binding.decoFrame.viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
 
         binding.buttonCrop.setOnClickListener {
+
             binding.ucropView.cropImageView.cropAndSaveImage(
                 Bitmap.CompressFormat.PNG,
                 90,
@@ -125,6 +146,8 @@ class CustomTrimmingActivity : AppCompatActivity() {
                 DecoInfo(decoImageView, binding.decoFrame)
             }.toList())
 
+        val cropMatrixValues = binding.ucropView.cropImageView.imageMatrix.values()
+
         setResult(
             Activity.RESULT_OK, Intent()
                 .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
@@ -133,6 +156,7 @@ class CustomTrimmingActivity : AppCompatActivity() {
                 .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
                 .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_X, offsetX)
                 .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_Y, offsetY)
+                .putExtra("MATRIX", cropMatrixValues)
                 .putParcelableArrayListExtra("DATA", decoInfos)
         )
     }
