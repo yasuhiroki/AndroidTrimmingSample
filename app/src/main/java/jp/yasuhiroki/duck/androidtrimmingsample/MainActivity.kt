@@ -1,13 +1,16 @@
 package jp.yasuhiroki.duck.androidtrimmingsample
 
 import android.content.Intent
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.values
 import androidx.databinding.DataBindingUtil
 import com.yalantis.ucrop.UCrop
 import jp.yasuhiroki.duck.androidtrimmingsample.databinding.ActivityMainBinding
@@ -61,18 +64,18 @@ class MainActivity : AppCompatActivity() {
 
             val decoImage = ImageView(this, null)
             decoImage.setImageResource(R.mipmap.ic_launcher)
-            decoImage.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-                decoImage.rotation = it.rect
-                decoImage.scaleX = it.scale * rateX
-                decoImage.scaleY = it.scale * rateY
-                decoImage.translationX =
-                    it.marginLeft * rateX + decoImage.measuredWidth * it.scale * (rateX - 1) / 2
-                decoImage.translationY =
-                    it.marginTop * rateY + decoImage.measuredHeight * it.scale * (rateY - 1) / 2
-            }
+            decoImage.scaleType = ImageView.ScaleType.MATRIX
+
+            val matrix = Matrix().apply { setValues(it.matrix) }
+            matrix.postScale(rateX, rateY, 0f, 0f)
+            decoImage.imageMatrix = matrix
+
             binding.decoFrame.addView(
                 decoImage,
-                FrameLayout.LayoutParams(it.layoutWidth, it.layoutHeight)
+                FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
             )
         }
     }
@@ -86,6 +89,8 @@ class DecoInfo : Parcelable {
     var layoutWidth: Int
     var layoutHeight: Int
 
+    var matrix: FloatArray
+
     var frameWidth: Int
     var frameHeight: Int
 
@@ -96,6 +101,8 @@ class DecoInfo : Parcelable {
         rect = v.rotation
         layoutWidth = v.layoutParams.width
         layoutHeight = v.layoutParams.height
+
+        matrix = v.matrix.values()
 
         frameWidth = f.width
         frameHeight = f.height
@@ -108,6 +115,11 @@ class DecoInfo : Parcelable {
         rect = i.readFloat()
         layoutWidth = i.readInt()
         layoutHeight = i.readInt()
+
+        val m = FloatArray(9)
+        i.readFloatArray(m)
+        matrix = m
+
         frameWidth = i.readInt()
         frameHeight = i.readInt()
     }
@@ -123,6 +135,9 @@ class DecoInfo : Parcelable {
         dest.writeFloat(rect)
         dest.writeInt(layoutWidth)
         dest.writeInt(layoutHeight)
+
+        dest.writeFloatArray(matrix)
+
         dest.writeInt(frameWidth)
         dest.writeInt(frameHeight)
     }
