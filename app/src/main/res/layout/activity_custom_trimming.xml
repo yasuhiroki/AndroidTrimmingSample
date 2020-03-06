@@ -13,16 +13,27 @@
         android:background="@color/colorPrimary"
         tools:context=".CustomTrimmingActivity">
 
+        <ImageView
+            android:id="@+id/blendImage"
+            android:layout_width="160dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/colorAccent"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1,1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <FrameLayout
             android:id="@+id/ucrop_frame"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="8dp"
             app:layout_constraintDimensionRatio="1,1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/blendImage">
 
             <com.yalantis.ucrop.view.UCropView
                 android:id="@+id/ucrop_view"
@@ -52,8 +63,10 @@
             android:id="@+id/button_deco"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="Deco"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_crop"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ucrop_frame" />
 
@@ -61,11 +74,23 @@
             android:id="@+id/button_crop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Crop"
+            app:layout_constraintEnd_toStartOf="@+id/button_cut"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_deco"
+            app:layout_constraintTop_toBottomOf="@+id/ucrop_frame" />
+
+        <Button
+            android:id="@+id/button_cut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Cut"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_deco" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/button_crop"
+            app:layout_constraintTop_toBottomOf="@+id/ucrop_frame" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -3,6 +3,8 @@ package jp.yasuhiroki.duck.androidtrimmingsample
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
@@ -111,11 +113,68 @@ class CustomTrimmingActivity : AppCompatActivity() {
                             imageWidth,
                             imageHeight
                         )
+
                         finish()
                     }
 
                     override fun onCropFailure(t: Throwable) {
+                        t.printStackTrace()
                         finish()
+                    }
+                })
+        }
+
+        binding.buttonCut.setOnClickListener {
+
+            binding.ucropView.cropImageView.cropAndSaveImage(
+                Bitmap.CompressFormat.PNG,
+                90,
+                object : BitmapCropCallback {
+                    override fun onBitmapCropped(
+                        resultUri: Uri,
+                        offsetX: Int,
+                        offsetY: Int,
+                        imageWidth: Int,
+                        imageHeight: Int
+                    ) {
+                        val croppedBitmap = BitmapFactory.decodeFile(resultUri.path)
+                        val canvasBitmap = Bitmap.createBitmap(
+                            croppedBitmap.width,
+                            croppedBitmap.height,
+                            Bitmap.Config.ARGB_8888
+                        )
+                        val canvas = Canvas(canvasBitmap)
+                        canvas.drawBitmap(croppedBitmap, 0f, 0f, null)
+
+                        val imageViewWidth = binding.decoFrame.width
+                        val imageViewHeight = binding.decoFrame.height
+                        val viewScaleX = croppedBitmap.width.toFloat() / imageViewWidth
+                        val viewScaleY = croppedBitmap.height.toFloat() / imageViewHeight
+
+                        binding.decoFrame.children.forEach {
+                            val decoImageView = it as GestureTransformableImageView
+
+                            val bitmap = Bitmap.createBitmap(
+                                croppedBitmap.width,
+                                croppedBitmap.height,
+                                Bitmap.Config.ARGB_8888
+                            )
+                            val decoCanvas = Canvas(bitmap)
+                            val matrix = Matrix().apply { setValues(decoImageView.matrix.values()) }
+                            matrix.postScale(viewScaleX, viewScaleY)
+                            decoCanvas.setMatrix(matrix)
+                            decoImageView.draw(decoCanvas)
+
+                            canvas.drawBitmap(bitmap, 0f, 0f, null)
+                        }
+
+                        binding.blendImage.setImageBitmap(canvasBitmap)
+
+                        binding.ucropView.cropImageView.setImageUri(src, dst)
+                    }
+
+                    override fun onCropFailure(t: Throwable) {
+                        t.printStackTrace()
                     }
                 })
         }
